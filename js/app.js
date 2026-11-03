@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         event.target.disabled = true;
 
         // log
-        Logger.subtitle(`Resumen del turno ${game.state.turn + 1}`);
+        Logger.subtitle(`Resumen del turno ${game.state.turn + 1}:`);
 
         // do the step stuff
         game.nextTurn();
