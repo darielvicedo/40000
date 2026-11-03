@@ -1,0 +1,17 @@
+import { Item } from "./item.js";
+
+export class Human extends Item {
+  static LOW_HUMAN_POPULATION = 10;
+  static HIGH_HUMAN_POPULATION = 42;
+  static MALE_PROPORTIONS = 29;
+  static MOVE_PROB = 70;
+
+  constructor(name, male = true) {
+    super();
+
+    this.name = name;
+    this.male = male;
+  }
+}
+
+export default Human;

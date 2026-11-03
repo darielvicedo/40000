@@ -1,0 +1,130 @@
+h1 {
+    text-align: center;
+}
+
+main {
+    width: 100%;
+    text-align: center;
+}
+
+.floating-bottom {
+    position: absolute;
+    bottom: 25px;
+    right: 25px;
+}
+
+.notice {
+    border: 1px solid limegreen;
+    padding: 15px 25px 15px 10px;
+    background-color: rgba(144, 238, 144, .5);
+    color: darkgreen;
+    text-align: start;
+    border-radius: 3px;
+    opacity: 1;
+    transition: opacity 0.4s ease;
+}
+
+.notice.fade-out {
+    opacity: 0;
+}
+
+.close-notice {
+    position: absolute;
+    top: -17;
+    right: -9;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+}
+
+.close-notice:hover {
+    color: #000;
+}
+
+#newGame {
+    width: 100%;
+    font-size: 18px;
+    color: whitesmoke;
+    font-weight: 500;
+    padding: 13px 20px;
+    border: 1px solid orange;
+    background: linear-gradient(purple, orange);
+    text-shadow: 1px 1px 1px grey;
+    cursor: pointer;
+}
+
+#newGame:disabled {
+    background: grey;
+    border-color: darkgray;
+}
+
+#newGame:disabled:hover {
+    background: grey;
+    border-color: darkgray;
+}
+
+#newGame:disabled:active {
+    box-shadow: none;
+}
+
+#newGame:hover {
+    background: linear-gradient(purple, darkorange);
+}
+
+#newGame:active {
+    box-shadow: inset 0 0 15px 5px rgba(0, 0, 0, .125);
+}
+
+#nextStep {
+    width: 100%;
+    font-size: 18px;
+    color: whitesmoke;
+    font-weight: 500;
+    padding: 13px 20px;
+    border: 1px solid green;
+    background: linear-gradient(lightgreen, green);
+    text-shadow: 1px 1px 1px grey;
+    cursor: pointer;
+}
+
+#nextStep:disabled {
+    background: grey;
+    border-color: darkgray;
+}
+
+#nextStep:disabled:hover {
+    background: grey;
+    border-color: darkgray;
+}
+
+#nextStep:disabled:active {
+    box-shadow: none;
+}
+
+#nextStep:hover {
+    background: linear-gradient(lightgreen, darkgreen);
+}
+
+#nextStep:active {
+    box-shadow: inset 0 0 15px 5px rgba(0, 0, 0, .125);
+}
+
+#stats {
+    background-color: lightyellow;
+}
+
+#stats p {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.notice-green {
+    font-size: small;
+    text-align: start;
+    background-color: lightgreen;
+    padding: 5px 10px 7px 10px;
+    border: 1px solid green;
+    color: black;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, .125);
+    box-shadow: inset 0 0 5px rgba(0, 128, 0, .5);
+}
