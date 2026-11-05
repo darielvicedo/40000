@@ -100,6 +100,9 @@ export class Game {
           specie.row = emptyCell.row;
           specie.col = emptyCell.col;
 
+          // vulgar name
+          specie.vulgar = variant.vulgar;
+
           // has name?
           if (variant.hasName) {
             const name = this.generateFantasyName(isMale);
@@ -108,6 +111,9 @@ export class Game {
 
           // push item to grid
           this.addItem(specie);
+
+          // on create
+          specie.onCreate();
 
           // update stats
           const specieType = variant.camelName;

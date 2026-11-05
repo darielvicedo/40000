@@ -4,6 +4,7 @@
     "variants": [
       {
         "type": "Panthera spelaea",
+        "vulgar": "León de las Cavernas",
         "camelName": "pantheraSpelaea",
         "hasName": false,
         "lowPopulation": 2,
@@ -21,6 +22,7 @@
     "variants": [
       {
         "type": "Homo sapiens",
+        "vulgar": "Humano",
         "camelName": "homoSapiens",
         "hasName": true,
         "lowPopulation": 10,

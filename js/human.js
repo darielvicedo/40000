@@ -1,4 +1,5 @@
 import { Item } from "./item.js";
+import Logger from "./logger.js";
 
 export class Human extends Item {
   static LOW_HUMAN_POPULATION = 10;
@@ -10,6 +11,15 @@ export class Human extends Item {
     super();
 
     this.male = male;
+
+    this.name = null;
+  }
+
+  onCreate() {
+    // log
+    Logger.info(
+      `${this.name} te saluda desde la casilla ${this.row},${this.col}!`,
+    );
   }
 }
 
