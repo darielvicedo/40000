@@ -2,10 +2,12 @@ import State from "./state.js";
 import Human from "./human.js";
 import Logger from "./logger.js";
 import Sprite from "./sprite.js";
+import Animal from "./animal.js";
 
 export class Game {
   static CANVAS_DIMENSION = 800;
   static BOARD_CASQUETS = 16;
+  static CLASES = { Animal, Human };
 
   constructor() {
     this.state = null;
@@ -37,82 +39,83 @@ export class Game {
           "female-homosapiens-paleo",
           "./sprites/homosapiens-female-paleo-48.png",
         ),
+        this.loadAsset(
+          "male-pantheraspelaea",
+          "./sprites/pantheraspelaea-male-48.png",
+        ),
+        this.loadAsset(
+          "female-pantheraspelaea",
+          "./sprites/pantheraspelaea-female-48.png",
+        ),
       ]);
     } catch (err) {
       console.error("Error loading game:", err);
     }
-    Logger.engine("recursos cargados...");
+    Logger.engine("recursos cargados.");
 
-    // 3. create humans
-    this.createHumans();
+    // 3. load items
+    await this.loadItems();
   }
 
   /**
-   * Creates the humans and adds them to the game.
+   * Factory
    */
-  createHumans() {
-    // determine human population
-    const population = Game.randomInt(
-      Human.LOW_HUMAN_POPULATION,
-      Human.HIGH_HUMAN_POPULATION,
-    );
+  async loadItems() {
+    // load data file
+    const response = await fetch("../data/data.json");
+    const itemsData = await response.json();
 
-    for (let i = 0; i < population; i++) {
-      // create a new human
-      const human = this.newHuman();
+    // iterate items types
+    itemsData.forEach((item) => {
+      // get class type
+      const classType = Game.CLASES[item.classType];
+      if (!classType) return;
 
-      // update items in grid
-      this.addItem(human);
+      // iterate variants
+      const variants = item.variants.forEach((variant) => {
+        // determine population
+        const population = Game.randomInt(
+          variant.lowPopulation,
+          variant.highPopulation,
+        );
 
-      // update stats
-      if (human.male) {
-        this.state.maleHomosapiens++;
-      } else {
-        this.state.femaleHomosapiens++;
-      }
+        // iterate population
+        for (let i = 0; i < population; i++) {
+          // define gender
+          const maleProb = Game.randomInt(1, 100);
+          const isMale = maleProb <= variant.maleProportions ? true : false;
 
-      // info
-      Logger.info(
-        `${human.name} te saluda desde la casilla ${human.row},${human.col}.`,
-      );
-    }
-  }
+          // get according sprite
+          const sprites = variant.sprites;
+          const assetName = isMale ? sprites.maleSprite : sprites.femaleSprite;
+          const asset = this.state.assets[assetName];
+          const sprite = new Sprite(asset);
 
-  /**
-   * Creates a new human.
-   *
-   * @returns Human
-   */
-  newHuman() {
-    // define gender
-    const maleProb = Game.randomInt(1, 100);
-    const male = maleProb <= Human.MALE_PROPORTIONS ? true : false;
+          // create specie instance
+          const specie = new classType(isMale);
+          specie.sprite = sprite;
 
-    // get according sprite
-    const assetName = male
-      ? "male-homosapiens-paleo"
-      : "female-homosapiens-paleo";
-    const asset = this.state.assets[assetName];
-    const sprite = new Sprite(asset);
+          // define item position
+          const emptyCell = this.state.grid.getRandomEmptyCell();
+          specie.row = emptyCell.row;
+          specie.col = emptyCell.col;
 
-    // generate name
-    const name = this.generateFantasyName(male);
+          // has name?
+          if (variant.hasName) {
+            const name = this.generateFantasyName(isMale);
+            specie.name = name;
+          }
 
-    // create human
-    const human = new Human(name, male);
-    human.sprite = sprite;
+          // push item to grid
+          this.addItem(specie);
 
-    // define item position
-    let row = null;
-    let col = null;
-    do {
-      row = Game.randomInt(0, Game.BOARD_CASQUETS - 1);
-      col = Game.randomInt(0, Game.BOARD_CASQUETS - 1);
-      human.row = row;
-      human.col = col;
-    } while (this.state.grid.get(row, col) !== null);
-
-    return human;
+          // update stats
+          const specieType = variant.camelName;
+          const gender = isMale ? "male" : "female";
+          this.state.population[specieType][gender]++;
+        }
+      });
+    });
   }
 
   /**

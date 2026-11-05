@@ -22,6 +22,22 @@ export class Grid {
     this.cells[row][col] = null;
   }
 
+  /**
+   * Finds a random empty cell.
+   * 
+   * @returns 
+   */
+  getRandomEmptyCell() {
+    let row = null;
+    let col = null;
+    do {
+      row = Game.randomInt(0, Game.BOARD_CASQUETS - 1);
+      col = Game.randomInt(0, Game.BOARD_CASQUETS - 1);
+    } while (this.get(row, col) !== null);
+
+    return { row: row, col: col };
+  }
+
   getCellCenter(col, row) {
     const cellSize = Game.CANVAS_DIMENSION / Game.BOARD_CASQUETS;
     const centerX = col * cellSize + cellSize / 2;

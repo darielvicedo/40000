@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     render.renderStats();
 
     // log
-    Logger.engine("tablero cargado...");
+    Logger.engine("tablero cargado.");
 
     // author welcome
     const text =
@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         Logger.engine("nuevo juego listo!");
 
         // story
-        const text = `Hace más de 40.000 años, en un rincón remoto de la Tierra, ${game.state.getTotalHumans()} ` +
+        const text = `Hace más de 40.000 años, en un rincón remoto de la Tierra, ${game.state.getSpeciePopulation("homoSapiens")} ` +
         `individuos de la especie Homo sapiens aparecen en un territorio salvaje de apenas 256 km². Su destino ` +
         `está en tus manos. Deberán explorar, adaptarse y aprender a dominar su entorno para garantizar la ` +
         `supervivencia de su especie hasta nuestros días. Cada turno será un nuevo desafío: sus decisiones ` +

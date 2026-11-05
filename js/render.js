@@ -58,15 +58,13 @@ export class Render {
    * Renders statistics.
    */
   renderStats() {
-    // update male homo sapiens
-    const statMaleHomosapiens = document.getElementById("statMaleHomosapiens");
-    statMaleHomosapiens.innerText = this.game.state.maleHomosapiens;
-
-    // update male homo sapiens
-    const statFemaleHomosapiens = document.getElementById(
-      "statFemaleHomosapiens",
-    );
-    statFemaleHomosapiens.innerText = this.game.state.femaleHomosapiens;
+    for (const specieType in this.game.state.population) {
+      for (const gender in this.game.state.population[specieType]) {
+        const id = `${specieType}.${gender}`;
+        const el = document.getElementById(id);
+        el.innerText = this.game.state.population[specieType][gender];
+      }
+    }
   }
 
   /**

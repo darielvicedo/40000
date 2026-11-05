@@ -20,16 +20,20 @@ export class State {
 
     this.items = [];
     this.assets = [];
+    this.population = {
+      homoSapiens: { male: 0, female: 0 },
+      pantheraSpelaea: { male: 0, female: 0 },
+    };
 
     this.turn = 0;
-    this.maleHomosapiens = 0;
-    this.femaleHomosapiens = 0;
 
     this.gameOver = false;
   }
 
-  getTotalHumans() {
-    return this.maleHomosapiens + this.femaleHomosapiens;
+  getSpeciePopulation(specieName) {
+    return (
+      this.population[specieName]["male"] + this.population[specieName]["female"]
+    );
   }
 
   /**

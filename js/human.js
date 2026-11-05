@@ -6,10 +6,9 @@ export class Human extends Item {
   static MALE_PROPORTIONS = 29;
   static MOVE_PROB = 70;
 
-  constructor(name, male = true) {
+  constructor(male = true) {
     super();
 
-    this.name = name;
     this.male = male;
   }
 }

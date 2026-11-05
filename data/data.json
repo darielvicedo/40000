@@ -1,0 +1,44 @@
+[
+  {
+    "classType": "Animal",
+    "variants": [
+      {
+        "type": "Panthera spelaea",
+        "camelName": "pantheraSpelaea",
+        "hasName": false,
+        "lowPopulation": 2,
+        "highPopulation": 2,
+        "maleProportions": 50,
+        "statVariable": {
+          "male": "malePanthera",
+          "female": "femalePanthera"
+        },
+        "sprites": {
+          "maleSprite": "male-pantheraspelaea",
+          "femaleSprite": "female-pantheraspelaea"
+        }
+      }
+    ]
+  },
+  {
+    "classType": "Human",
+    "variants": [
+      {
+        "type": "Homo sapiens",
+        "camelName": "homoSapiens",
+        "hasName": true,
+        "lowPopulation": 10,
+        "highPopulation": 42,
+        "maleProportions": 29,
+        "statVariable": {
+          "male": "maleHomo",
+          "female": "femaleHomo"
+        },
+        "sprites": {
+          "maleSprite": "male-homosapiens-paleo",
+          "femaleSprite": "female-homosapiens-paleo"
+        }
+      }
+    ]
+  }
+]
