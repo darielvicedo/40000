@@ -32,7 +32,8 @@ export class State {
 
   getSpeciePopulation(specieName) {
     return (
-      this.population[specieName]["male"] + this.population[specieName]["female"]
+      this.population[specieName]["male"] +
+      this.population[specieName]["female"]
     );
   }
 
@@ -70,23 +71,12 @@ export class State {
   }
 
   nextTurn() {
-    this.turn++;
-
-    // iterate items
+    // A) move all movable items
     for (const item of [...this.items]) {
-      // actions if item is human
-      if (item instanceof Human) {
-        // 1. determine if the human will move
-        const willMove =
-          Game.randomInt(1, 100) < Human.MOVE_PROB ? true : false;
-
-        // 1.1 do nothing if human stay
-        if (!willMove) {
-          Logger.info(`${item.name} ha decidido mantenerse en el lugar.`);
-          continue;
-        }
-
-        // 2. determine adjacent cell to move to
+      // 1. check moving probabilities
+      const willMove = Game.randomInt(1, 100) < item.movingProb ? true : false;
+      if (willMove) {
+        // 1. determine adjacent cell to move to
         let adjacent = null;
         do {
           const position = State.ADJACENTS_POSITIONS[Game.randomInt(0, 7)];
@@ -96,22 +86,26 @@ export class State {
           this.grid.get(adjacent.row, adjacent.col) !== null
         );
 
-        // log
-        Logger.info(
-          `${item.name} se ha movido desde ${item.row},${item.col} hasta ${adjacent.row},${adjacent.col}`,
-        );
-
-        // 3. free item position
+        // 2. free source item position
         this.grid.remove(item.row, item.col);
 
-        // 4. update item position
+        // 3. update item position
         item.row = adjacent.row;
         item.col = adjacent.col;
 
-        // 5. update the grid
+        // 4. update the grid
         this.grid.set(adjacent.row, adjacent.col, item);
+
+        // 5. event
+        item.onMove();
+      } else {
+        // 1. event
+        item.onStay();
+        continue;
       }
     }
+
+    this.turn++;
   }
 }
 

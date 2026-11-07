@@ -9,7 +9,7 @@
         "hasName": false,
         "lowPopulation": 2,
         "highPopulation": 2,
-        "isMovable": true,
+        "movingProb": 40,
         "sprite": null,
         "gender": {
           "maleProportions": 50,
@@ -31,7 +31,7 @@
         "hasName": true,
         "lowPopulation": 10,
         "highPopulation": 42,
-        "isMovable": true,
+        "movingProb": 70,
         "sprite": null,
         "gender": {
           "maleProportions": 29,

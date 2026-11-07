@@ -76,6 +76,9 @@ export class Game {
         // vulgar name
         const vulgar = variant.vulgar;
 
+        // moving probability
+        const movingProb = variant.movingProb;
+
         // determine population
         const population = Game.randomInt(
           variant.lowPopulation,
@@ -111,6 +114,7 @@ export class Game {
             emptyCell.row,
             emptyCell.col,
             sprite,
+            movingProb
           );
           specie.sprite = sprite;
 
