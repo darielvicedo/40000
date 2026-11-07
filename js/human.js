@@ -7,10 +7,10 @@ export class Human extends Item {
   static MALE_PROPORTIONS = 29;
   static MOVE_PROB = 70;
 
-  constructor(male = true) {
-    super();
+  constructor(vulgar, row, col, sprite) {
+    super(vulgar, row, col, sprite);
 
-    this.male = male;
+    this.male = true;
 
     this.name = null;
   }
@@ -18,7 +18,7 @@ export class Human extends Item {
   onCreate() {
     // log
     Logger.info(
-      `${this.name} te saluda desde la casilla ${this.row},${this.col}!`,
+      `${this.name} te saluda desde la casilla ${this.row},${this.col}`,
     );
   }
 }

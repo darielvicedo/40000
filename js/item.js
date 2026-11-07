@@ -6,11 +6,11 @@ export class Item {
    *
    * @param {Sprite} sprite
    */
-  constructor() {
-    this.row = null;
-    this.col = null;
-    this.sprite = null;
-    this.vulgar = null;
+  constructor(vulgar, row, col, sprite) {
+    this.vulgar = vulgar;
+    this.row = row;
+    this.col = col;
+    this.sprite = sprite;
   }
 
   onCreate() {

@@ -9,10 +9,14 @@
         "hasName": false,
         "lowPopulation": 2,
         "highPopulation": 2,
-        "maleProportions": 50,
-        "sprites": {
-          "maleSprite": "male-pantheraspelaea",
-          "femaleSprite": "female-pantheraspelaea"
+        "isMovable": true,
+        "sprite": null,
+        "gender": {
+          "maleProportions": 50,
+          "sprites": {
+            "maleSprite": "male-pantheraspelaea",
+            "femaleSprite": "female-pantheraspelaea"
+          }
         }
       }
     ]
@@ -27,10 +31,14 @@
         "hasName": true,
         "lowPopulation": 10,
         "highPopulation": 42,
-        "maleProportions": 29,
-        "sprites": {
-          "maleSprite": "male-homosapiens-paleo",
-          "femaleSprite": "female-homosapiens-paleo"
+        "isMovable": true,
+        "sprite": null,
+        "gender": {
+          "maleProportions": 29,
+          "sprites": {
+            "maleSprite": "male-homosapiens-paleo",
+            "femaleSprite": "female-homosapiens-paleo"
+          }
         }
       }
     ]

@@ -2,10 +2,10 @@ import { Item } from "./item.js";
 import Logger from "./logger.js";
 
 export class Animal extends Item {
-  constructor(male = true) {
-    super();
+  constructor(vulgar, row, col, sprite) {
+    super(vulgar, row, col, sprite);
 
-    this.male = male;
+    this.male = true;
   }
 
   onCreate() {

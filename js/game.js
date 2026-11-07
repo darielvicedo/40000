@@ -73,6 +73,9 @@ export class Game {
 
       // iterate variants
       const variants = item.variants.forEach((variant) => {
+        // vulgar name
+        const vulgar = variant.vulgar;
+
         // determine population
         const population = Game.randomInt(
           variant.lowPopulation,
@@ -81,27 +84,40 @@ export class Game {
 
         // iterate population
         for (let i = 0; i < population; i++) {
+          // define  sprite
+          let sprite = variant.sprite;
+
           // define gender
-          const maleProb = Game.randomInt(1, 100);
-          const isMale = maleProb <= variant.maleProportions ? true : false;
+          let isMale = null;
+          if (variant.gender !== null) {
+            const maleProb = Game.randomInt(1, 100);
+            isMale = maleProb <= variant.maleProportions ? true : false;
 
-          // get according sprite
-          const sprites = variant.sprites;
-          const assetName = isMale ? sprites.maleSprite : sprites.femaleSprite;
-          const asset = this.state.assets[assetName];
-          const sprite = new Sprite(asset);
-
-          // create specie instance
-          const specie = new classType(isMale);
-          specie.sprite = sprite;
+            // get according sprite
+            const sprites = variant.gender.sprites;
+            const assetName = isMale
+              ? sprites.maleSprite
+              : sprites.femaleSprite;
+            const asset = this.state.assets[assetName];
+            sprite = new Sprite(asset);
+          }
 
           // define item position
           const emptyCell = this.state.grid.getRandomEmptyCell();
-          specie.row = emptyCell.row;
-          specie.col = emptyCell.col;
 
-          // vulgar name
-          specie.vulgar = variant.vulgar;
+          // create specie instance
+          const specie = new classType(
+            vulgar,
+            emptyCell.row,
+            emptyCell.col,
+            sprite,
+          );
+          specie.sprite = sprite;
+
+          // has gender?
+          if (variant.gender !== null) {
+            specie.isMale = isMale;
+          }
 
           // has name?
           if (variant.hasName) {
