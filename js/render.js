@@ -37,6 +37,7 @@ export class Render {
     const items = this.game.state.items;
 
     for (const item of items) {
+      // calculate sprite position in grid
       const position = this.game.state.grid.getCellPosition(
         item.col,
         item.row,
@@ -44,14 +45,45 @@ export class Render {
         item.sprite.height,
       );
 
-      this.ctx.drawImage(
+      // flip image x axis
+      const flipX = Game.randomInt(0, 1) > 0 ? true : false;
+
+      // draw sprite
+      this.drawSprite(
         item.sprite.image,
         position.x,
         position.y,
         item.sprite.width,
         item.sprite.height,
+        flipX,
       );
     }
+  }
+
+  /**
+   * Draw an image.
+   * 
+   * @param {HTMLImageElement} img 
+   * @param {Number} x 
+   * @param {Number} y 
+   * @param {Number} w 
+   * @param {Number} h 
+   * @param {Boolean} flipX 
+   * @param {Boolean} flipY 
+   */
+  drawSprite(img, x, y, w, h, flipX = false, flipY = false) {
+    const ctx = this.ctx;
+
+    ctx.save();
+
+    // flip?
+    ctx.translate(flipX ? x + w : x, flipY ? y + h : y);
+    ctx.scale(flipX ? -1 : 1, flipY ? -1 : 1);
+
+    // draw
+    ctx.drawImage(img, 0, 0, w, h);
+
+    ctx.restore();
   }
 
   /**
