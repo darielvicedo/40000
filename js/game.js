@@ -94,7 +94,7 @@ export class Game {
           let isMale = null;
           if (variant.gender !== null) {
             const maleProb = Game.randomInt(1, 100);
-            isMale = maleProb <= variant.maleProportions ? true : false;
+            isMale = maleProb <= variant.gender.maleProportions ? true : false;
 
             // get according sprite
             const sprites = variant.gender.sprites;
