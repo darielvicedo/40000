@@ -62,7 +62,7 @@ export class Game {
    */
   async loadItems() {
     // load data file
-    const response = await fetch("../data/data.json");
+    const response = await fetch("data/data.json");
     const itemsData = await response.json();
 
     // iterate items types
