@@ -70,6 +70,9 @@ export class State {
       : null;
   }
 
+  /**
+   * Runs turn mechanics.
+   */
   nextTurn() {
     // A) move all movable items
     for (const item of [...this.items]) {
@@ -105,7 +108,25 @@ export class State {
       }
     }
 
+    // shuffle items array
+    this.shuffleItems();
+    
+    // increase turn
     this.turn++;
+  }
+
+  /**
+   * Shuffles items array.
+   * 
+   * Shuffles items array in order to randomize
+   * the priority order (Fisher-Yates Algorithm).
+   */
+  shuffleItems() {
+    for (let i = this.items.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+
+      [this.items[i], this.items[j]] = [this.items[j], this.items[i]];
+    }
   }
 }
 
