@@ -10,7 +10,7 @@ export class Animal extends Item {
 
   onCreate() {
     // log
-    const gender = this.male ? "macho" : "hembra";
+    const gender = this.isMale ? "macho" : "hembra";
     Logger.info(
       `Un nuevo ${this.vulgar} ${gender} ha sido creado en la casilla ${this.row},${this.col}`,
     );
