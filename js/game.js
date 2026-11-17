@@ -27,8 +27,6 @@ export class Game {
 			population: 0,
 		};
 
-		// load data
-
 		// create empty grid
 		const cells = this.engine.getParam("boardCasquets");
 		this.cells = Array.from({ length: cells }, () =>
@@ -46,6 +44,16 @@ export class Game {
 
 	async removeCellItem(row, col) {
 		this.cells[row][col] = null;
+	}
+
+	getAvailableAdjacentCells(row, col) {
+		return Object.values(Game.ADJACENTS_POSITIONS)
+			.map((position) => this.getAdjacentCell(row, col, position))
+			.filter(
+				(cell) =>
+					cell !== null &&
+					this.getCellItem(cell.row, cell.col) === null,
+			);
 	}
 
 	/**
@@ -228,7 +236,7 @@ export class Game {
 					// update stats
 					const specieType = variant.camelName;
 					const gender = isMale ? "male" : "female";
-					this.population++;
+					this.state.population++;
 				}
 			});
 		});
@@ -280,32 +288,33 @@ export class Game {
 				this.engine.randomInt(1, 100) < item.movingProb ? true : false;
 			if (willMove) {
 				// 1. determine adjacent cell to move to
-				let adjacent = null;
-				do {
-					const position =
-						Game.ADJACENTS_POSITIONS[this.engine.randomInt(0, 7)];
-					adjacent = this.getAdjacentCell(
-						item.row,
-						item.col,
-						position,
-					);
-				} while (
-					adjacent === null ||
-					this.getCellItem(adjacent.row, adjacent.col) !== null
+				const available = this.getAvailableAdjacentCells(
+					item.row,
+					item.col,
 				);
+				if (available.length > 0) {
+					const index = this.engine.randomInt(
+						0,
+						available.length - 1,
+					);
 
-				// 2. free source item position
-				await this.removeCellItem(item.row, item.col);
+					const adjacent = available[index];
 
-				// 3. update item position
-				item.row = await adjacent.row;
-				item.col = await adjacent.col;
+					// 2. free source item position
+					await this.removeCellItem(item.row, item.col);
 
-				// 4. update the grid
-				await this.setCellItem(adjacent.row, adjacent.col, item);
+					// 3. update item position
+					item.row = await adjacent.row;
+					item.col = await adjacent.col;
 
-				// 5. event
-				item.onMove();
+					// 4. update the grid
+					await this.setCellItem(adjacent.row, adjacent.col, item);
+
+					// 5. event
+					item.onMove();
+				} else {
+					// item is surrounded, new mechanics
+				}
 			} else {
 				// 1. event
 				item.onStay();
