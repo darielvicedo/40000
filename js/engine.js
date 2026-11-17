@@ -6,7 +6,7 @@ export class Engine {
 		this.ctx = ctx;
 
 		this.config = {};
-		this.assets = [];
+		this.assets = Object.create(null);
 	}
 
 	/**
@@ -27,28 +27,17 @@ export class Engine {
 	 * Starts the engine.
 	 */
 	async ignite() {
-		// loads game configuration
-		try {
-			await this.loadConfig();
-		} catch (e) {
-			console.error(e);
-		}
+		await this.loadConfig();
 
-		// title
-		const title = this.getParam("title");
-		Logger.title(`Bienvenido a ${title}`);
+		Logger.title(`Bienvenido a ${this.getParam("title")}`);
 
-		// loads assets
-		try {
-			await this.loadAssets();
-			Logger.engine(`archivos cargados.`);
-		} catch (e) {
-			console.error(e);
-		}
+		await this.loadAssets();
 
-		// render empty grid
+		Logger.engine("Archivos cargados.");
+
 		this.renderGrid();
-		Logger.engine("tablero cargado.");
+
+		Logger.engine("Tablero cargado.");
 	}
 
 	async newGame() {
@@ -83,13 +72,12 @@ export class Engine {
 	 */
 	async loadAssets() {
 		const assets = this.getParam("assets");
-		for (const asset of [...assets]) {
-			try {
-				this.loadAsset(asset.name, "assets/" + asset.src);
-			} catch (e) {
-				throw e;
-			}
-		}
+
+		await Promise.all(
+			assets.map((asset) =>
+				this.loadAsset(asset.name, `assets/${asset.src}`),
+			),
+		);
 	}
 
 	/**
@@ -108,13 +96,11 @@ export class Engine {
 				resolve(image);
 			};
 
-			image.onerror = (err) => {
-				throw new Error("No se ha podido cargar " + src);
+			image.onerror = () => {
+				reject(new Error(`No se pudo cargar: ${src}`));
 			};
 
 			image.src = src;
-
-			this.assets[name] = image;
 		});
 	}
 
