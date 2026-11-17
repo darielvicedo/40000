@@ -1,46 +1,52 @@
-[
-  {
-    "classType": "Animal",
-    "variants": [
-      {
-        "type": "Panthera spelaea",
-        "vulgar": "León de las Cavernas",
-        "camelName": "pantheraSpelaea",
-        "hasName": false,
-        "lowPopulation": 2,
-        "highPopulation": 2,
-        "movingProb": 40,
-        "sprite": null,
-        "gender": {
-          "maleProportions": 50,
-          "sprites": {
-            "maleSprite": "male-pantheraspelaea",
-            "femaleSprite": "female-pantheraspelaea"
-          }
-        }
-      }
-    ]
-  },
-  {
-    "classType": "Human",
-    "variants": [
-      {
-        "type": "Homo sapiens",
-        "vulgar": "Humano",
-        "camelName": "homoSapiens",
-        "hasName": true,
-        "lowPopulation": 10,
-        "highPopulation": 42,
-        "movingProb": 70,
-        "sprite": null,
-        "gender": {
-          "maleProportions": 29,
-          "sprites": {
-            "maleSprite": "male-homosapiens-paleo",
-            "femaleSprite": "female-homosapiens-paleo"
-          }
-        }
-      }
-    ]
-  }
-]
+{
+	"messages": {
+		"welcome": "40,000 ANE es un sencillo y pequeño juego de simulación por turnos inspirado en la historia humana de hace más de 40 mil años. Lo he ido desarrollando en mi tiempo libre para contar a mi hija pequeña la maravillosa historia de nuestra especie. Espero que te guste y que te sea útil y divertido como lo ha sido para nosotros.",
+    "newGame": "Hace más de 40.000 años, en un rincón remoto de la Tierra, algunos individuos de la especie Homo sapiens aparecen en un territorio salvaje de apenas 256 km². Su destino está en tus manos. Deberán explorar, adaptarse y aprender a dominar su entorno para garantizar la supervivencia de su especie hasta nuestros días. Cada turno será un nuevo desafío: sus decisiones podrán acercarlos a la gloria evolutiva o conducirlos a una extinción tan rápida como definitiva."
+	},
+	"items": [
+		{
+			"classType": "Animal",
+			"variants": [
+				{
+					"type": "Panthera spelaea",
+					"vulgar": "León de las Cavernas",
+					"camelName": "pantheraSpelaea",
+					"hasName": false,
+					"lowPopulation": 2,
+					"highPopulation": 2,
+					"movingProb": 40,
+					"sprite": null,
+					"gender": {
+						"maleProportions": 50,
+						"sprites": {
+							"maleSprite": "male-pantheraspelaea-normal",
+							"femaleSprite": "female-pantheraspelaea-normal"
+						}
+					}
+				}
+			]
+		},
+		{
+			"classType": "Human",
+			"variants": [
+				{
+					"type": "Homo sapiens",
+					"vulgar": "Humano",
+					"camelName": "homoSapiens",
+					"hasName": true,
+					"lowPopulation": 10,
+					"highPopulation": 42,
+					"movingProb": 70,
+					"sprite": null,
+					"gender": {
+						"maleProportions": 29,
+						"sprites": {
+							"maleSprite": "male-homosapiens-normal",
+							"femaleSprite": "female-homosapiens-normal"
+						}
+					}
+				}
+			]
+		}
+	]
+}

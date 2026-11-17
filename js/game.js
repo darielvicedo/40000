@@ -1,364 +1,370 @@
-import State from "./state.js";
 import Human from "./human.js";
 import Logger from "./logger.js";
 import Sprite from "./sprite.js";
 import Animal from "./animal.js";
 
 export class Game {
-  static CANVAS_DIMENSION = 800;
-  static BOARD_CASQUETS = 16;
-  static CLASES = { Animal, Human };
+	static CLASES = { Animal, Human };
+	static ADJACENTS_POSITIONS = {
+		0: "top",
+		1: "topRight",
+		2: "right",
+		3: "bottomRight",
+		4: "bottom",
+		5: "bottomLeft",
+		6: "left",
+		7: "topLeft",
+	};
 
-  constructor() {
-    this.state = null;
-  }
+	constructor(engine) {
+		this.engine = engine;
 
-  /**
-   * Starts engine.
-   */
-  start() {
-    // create state
-    this.state = new State();
-  }
+		this.turn = 0;
+		this.gameOver = false;
 
-  /**
-   * Creates a new game.
-   */
-  async newGame() {
-    // 1. reset game
-    this.start();
+		this.items = [];
+		this.state = {
+			population: 0,
+		};
 
-    // 2. load assets
-    try {
-      await Promise.all([
-        this.loadAsset(
-          "male-homosapiens-paleo",
-          "./sprites/homosapiens-male-paleo-48.png",
-        ),
-        this.loadAsset(
-          "female-homosapiens-paleo",
-          "./sprites/homosapiens-female-paleo-48.png",
-        ),
-        this.loadAsset(
-          "male-pantheraspelaea",
-          "./sprites/pantheraspelaea-male-48.png",
-        ),
-        this.loadAsset(
-          "female-pantheraspelaea",
-          "./sprites/pantheraspelaea-female-48.png",
-        ),
-      ]);
-    } catch (err) {
-      console.error("Error loading game:", err);
-    }
-    Logger.engine("recursos cargados.");
+		// load data
 
-    // 3. load items
-    await this.loadItems();
-  }
+		// create empty grid
+		const cells = this.engine.getParam("boardCasquets");
+		this.cells = Array.from({ length: cells }, () =>
+			Array.from({ length: cells }, () => null),
+		);
+	}
 
-  /**
-   * Factory
-   */
-  async loadItems() {
-    // load data file
-    const response = await fetch("data/data.json");
-    const itemsData = await response.json();
+	getCellItem(row, col) {
+		return this.cells[row]?.[col] ?? null;
+	}
 
-    // iterate items types
-    itemsData.forEach((item) => {
-      // get class type
-      const classType = Game.CLASES[item.classType];
-      if (!classType) return;
+	async setCellItem(row, col, item) {
+		this.cells[row][col] = item;
+	}
 
-      // iterate variants
-      const variants = item.variants.forEach((variant) => {
-        // vulgar name
-        const vulgar = variant.vulgar;
+	async removeCellItem(row, col) {
+		this.cells[row][col] = null;
+	}
 
-        // moving probability
-        const movingProb = variant.movingProb;
+	/**
+	 * Finds a random empty cell.
+	 *
+	 * @returns
+	 */
+	getRandomEmptyCell() {
+		const cells = this.engine.getParam("boardCasquets");
+		let row = null;
+		let col = null;
+		do {
+			row = this.engine.randomInt(0, cells - 1);
+			col = this.engine.randomInt(0, cells - 1);
+		} while (this.getCellItem(row, col) !== null);
 
-        // determine population
-        const population = Game.randomInt(
-          variant.lowPopulation,
-          variant.highPopulation,
-        );
+		return { row: row, col: col };
+	}
 
-        // iterate population
-        for (let i = 0; i < population; i++) {
-          // define  sprite
-          let sprite = variant.sprite;
+	getCellCenter(col, row) {
+		const dimension = this.engine.getParam("boardDimension");
+		const cells = this.engine.getParam("boardCasquets");
+		const cellSize = dimension / cells;
+		const centerX = col * cellSize + cellSize / 2;
+		const centerY = row * cellSize + cellSize / 2;
 
-          // define gender
-          let isMale = null;
-          if (variant.gender !== null) {
-            const maleProb = Game.randomInt(1, 100);
-            isMale = maleProb <= variant.gender.maleProportions ? true : false;
+		return { x: centerX, y: centerY };
+	}
 
-            // get according sprite
-            const sprites = variant.gender.sprites;
-            const assetName = isMale
-              ? sprites.maleSprite
-              : sprites.femaleSprite;
-            const asset = this.state.assets[assetName];
-            sprite = new Sprite(asset);
-          }
+	getCellPosition(col, row, spriteWidth, spriteHeight) {
+		const center = this.getCellCenter(col, row);
 
-          // define item position
-          const emptyCell = this.state.grid.getRandomEmptyCell();
+		return {
+			x: center.x - spriteWidth / 2,
+			y: center.y - spriteHeight / 2,
+		};
+	}
 
-          // create specie instance
-          const specie = new classType(
-            vulgar,
-            emptyCell.row,
-            emptyCell.col,
-            sprite,
-            movingProb
-          );
-          specie.sprite = sprite;
+	/**
+	 * Calculates the adjacent cell according to a relative position string.
+	 *
+	 * @param {Casquet} casquet
+	 * @param {String} position
+	 * @returns ?
+	 */
+	getAdjacentCell(row, col, position) {
+		const casquets = this.engine.getParam("boardCasquets");
 
-          // has gender?
-          if (variant.gender !== null) {
-            specie.isMale = isMale;
-          }
+		// relative positions
+		let topRow = row >= 1 ? row - 1 : null;
+		let bottomRow = row < casquets - 1 ? row + 1 : null;
+		let leftCol = col >= 1 ? col - 1 : null;
+		let rightCol = col < casquets - 1 ? col + 1 : null;
 
-          // has name?
-          if (variant.hasName) {
-            const name = this.generateFantasyName(isMale);
-            specie.name = name;
-          }
+		const adjacents = {
+			top: { row: topRow, col: col },
+			topRight: { row: topRow, col: rightCol },
+			right: { row: row, col: rightCol },
+			bottomRight: { row: bottomRow, col: rightCol },
+			bottom: { row: bottomRow, col: col },
+			bottomLeft: { row: bottomRow, col: leftCol },
+			left: { row: row, col: leftCol },
+			topLeft: { row: topRow, col: leftCol },
+		};
 
-          // push item to grid
-          this.addItem(specie);
+		let adjacentRow = adjacents[position]["row"];
+		let adjacentCol = adjacents[position]["col"];
 
-          // on create
-          specie.onCreate();
+		return adjacentRow !== null && adjacentCol !== null
+			? { row: adjacentRow, col: adjacentCol }
+			: null;
+	}
 
-          // update stats
-          const specieType = variant.camelName;
-          const gender = isMale ? "male" : "female";
-          this.state.population[specieType][gender]++;
-        }
-      });
-    });
-  }
+	async start() {
+		// load data
+		await this.loadData();
 
-  /**
-   * Runs the next turn.
-   *
-   * @returns
-   */
-  nextTurn() {
-    if (!this.state) return;
+		// new game message
+		Logger.subtitle("Nuevo juego");
 
-    this.state.nextTurn();
-  }
+		// welcome
+		Logger.author(this.data.messages.welcome);
 
-  /**
-   * Add the item to items collection and set it in the grid.
-   *
-   * @param {Item} item
-   */
-  addItem(item) {
-    this.state.items.push(item);
-    this.state.grid.set(item.row, item.col, item);
-  }
+		// load items
+		Logger.engine("cargando datos...");
+		await this.loadItems();
 
-  /**
-   * Loads an asset and adds it to the assets collection.
-   *
-   * @param {String} name
-   * @param {String} src
-   * @returns
-   */
-  loadAsset(name, src) {
-    return new Promise((resolve, reject) => {
-      const image = new Image();
+		// ready
+		Logger.engine("juego listo!");
 
-      image.onload = () => {
-        this.state.assets[name] = image;
-        resolve(image);
-      };
+		// story
+		Logger.narrator(this.data.messages.newGame);
 
-      image.onerror = (err) => {
-        reject(err);
-      };
+		// show items
+		this.showItems();
+	}
 
-      image.src = src;
+	async loadData() {
+		const response = await fetch("data/data.json");
+		this.data = await response.json();
+	}
 
-      this.state.assets[name] = image;
-    });
-  }
+	/**
+	 * Factory
+	 */
+	async loadItems() {
+		// iterate items types
+		this.data.items.forEach((item) => {
+			// get class type
+			const classType = Game.CLASES[item.classType];
+			if (!classType) return;
 
-  /**
-   * Renders other HTML elements.
-   */
-  renderHtml() {
-    const state = this.get("state");
+			// iterate variants
+			const variants = item.variants.forEach((variant) => {
+				// vulgar name
+				const vulgar = variant.vulgar;
 
-    // next turn text
-    const stepButton = document.getElementById("nextStep");
-    stepButton.innerText = `Turno ${state["step"]}, Siguiente`;
-  }
+				// moving probability
+				const movingProb = variant.movingProb;
 
-  /**
-   * Gets a random integer between min and max included.
-   *
-   * @param {Number} min
-   * @param {Number} max
-   * @returns Number
-   */
-  static randomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
+				// determine population
+				const population = this.engine.randomInt(
+					variant.lowPopulation,
+					variant.highPopulation,
+				);
 
-  /**
-   * Generates  a fantasy name --generated with ChatGPT.
-   *
-   * @param {Boolean} male
-   * @param {Boolean} lastName
-   * @returns
-   */
-  generateFantasyName(male = true, lastName = true) {
-    const consonants = [
-      "b",
-      "br",
-      "c",
-      "ch",
-      "d",
-      "dr",
-      "f",
-      "fl",
-      "g",
-      "gr",
-      "h",
-      "j",
-      "k",
-      "kr",
-      "l",
-      "m",
-      "n",
-      "p",
-      "pr",
-      "r",
-      "s",
-      "sh",
-      "st",
-      "t",
-      "th",
-      "tr",
-      "v",
-      "w",
-      "y",
-      "z",
-    ];
+				// iterate population
+				for (let i = 0; i < population; i++) {
+					// define  sprite
+					let sprite = variant.sprite;
 
-    const vowels = [
-      "a",
-      "e",
-      "i",
-      "o",
-      "u",
-      "ae",
-      "ai",
-      "ea",
-      "ee",
-      "ia",
-      "ie",
-      "oa",
-      "oo",
-      "ou",
-      "ui",
-    ];
+					// define gender
+					let isMale = null;
+					if (variant.gender !== null) {
+						const maleProb = this.engine.randomInt(1, 100);
+						isMale =
+							maleProb <= variant.gender.maleProportions
+								? true
+								: false;
 
-    const maleEndings = [
-      "an",
-      "ar",
-      "en",
-      "er",
-      "ian",
-      "iel",
-      "in",
-      "on",
-      "or",
-      "yn",
-      "is",
-      "eth",
-      "as",
-      "us",
-      "ael",
-      "ion",
-    ];
+						// get according sprite
+						const sprites = variant.gender.sprites;
+						const assetName = isMale
+							? sprites.maleSprite
+							: sprites.femaleSprite;
+						const asset = this.engine.assets[assetName];
+						sprite = new Sprite(asset);
+					}
 
-    const femaleEndings = [
-      "a",
-      "ia",
-      "ina",
-      "elle",
-      "ara",
-      "ana",
-      "iel",
-      "ine",
-      "ora",
-      "wen",
-      "eth",
-      "issa",
-      "aya",
-      "eia",
-      "lyn",
-      "ith",
-    ];
+					// define item position
+					const emptyCell = this.getRandomEmptyCell();
 
-    const surnameEndings = [
-      "ford",
-      "wood",
-      "stone",
-      "well",
-      "brook",
-      "field",
-      "mere",
-      "dale",
-      "thorn",
-      "wick",
-      "more",
-      "borne",
-      "crest",
-      "vale",
-      "hart",
-    ];
+					// create specie instance
+					const specie = new classType(
+						vulgar,
+						emptyCell.row,
+						emptyCell.col,
+						sprite,
+						movingProb,
+					);
+					specie.sprite = sprite;
 
-    const random = (array) => array[Math.floor(Math.random() * array.length)];
+					// has gender?
+					if (variant.gender !== null) {
+						specie.isMale = isMale;
+					}
 
-    function generateRoot(min = 2, max = 3) {
-      const syllables = min + Math.floor(Math.random() * (max - min + 1));
+					// has name?
+					if (variant.hasName) {
+						const name = this.engine.generateFantasyName(isMale);
+						specie.name = name;
+					}
 
-      let name = "";
+					// push item to grid
+					this.addItem(specie);
 
-      for (let i = 0; i < syllables; i++) {
-        name += random(consonants);
-        name += random(vowels);
-      }
+					// on create
+					specie.onCreate();
 
-      return name;
-    }
+					// update stats
+					const specieType = variant.camelName;
+					const gender = isMale ? "male" : "female";
+					this.population++;
+				}
+			});
+		});
+	}
 
-    // Nombre propio según género
-    const endings = male ? maleEndings : femaleEndings;
+	showItems() {
+		for (const item of [...this.items]) {
+			this.showItem(item);
+		}
+	}
 
-    let firstName = generateRoot(1, 2) + random(endings);
+	showItem(item) {
+		// calculate item position in grid
+		const position = this.getCellPosition(
+			item.col,
+			item.row,
+			item.sprite.width,
+			item.sprite.height,
+		);
 
-    firstName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+		// random x axis facing
+		const flipX = this.engine.randomInt(0, 1) > 0 ? true : false;
 
-    if (!lastName) return firstName;
+		// draw the sprite
+		this.engine.drawImage(
+			item.sprite.image,
+			position.x,
+			position.y,
+			item.sprite.width,
+			item.sprite.height,
+			flipX,
+		);
+	}
 
-    // Apellido independiente del género
-    let surname = generateRoot(1, 1) + random(surnameEndings);
+	/**
+	 * Runs turn mechanics.
+	 *
+	 * @returns
+	 */
+	async nextTurn() {
+		// increase turn
+		this.turn++;
+		Logger.subtitle(`Turno ${this.turn}`);
 
-    surname = surname.charAt(0).toUpperCase() + surname.slice(1);
+		// A) move all movable items
+		for (const item of [...this.items]) {
+			// 1. check moving probabilities
+			const willMove =
+				this.engine.randomInt(1, 100) < item.movingProb ? true : false;
+			if (willMove) {
+				// 1. determine adjacent cell to move to
+				let adjacent = null;
+				do {
+					const position =
+						Game.ADJACENTS_POSITIONS[this.engine.randomInt(0, 7)];
+					adjacent = this.getAdjacentCell(
+						item.row,
+						item.col,
+						position,
+					);
+				} while (
+					adjacent === null ||
+					this.getCellItem(adjacent.row, adjacent.col) !== null
+				);
 
-    return `${firstName} ${surname}`;
-  }
+				// 2. free source item position
+				await this.removeCellItem(item.row, item.col);
+
+				// 3. update item position
+				item.row = await adjacent.row;
+				item.col = await adjacent.col;
+
+				// 4. update the grid
+				await this.setCellItem(adjacent.row, adjacent.col, item);
+
+				// 5. event
+				item.onMove();
+			} else {
+				// 1. event
+				item.onStay();
+			}
+		}
+
+		this.engine.renderGrid();
+		this.showItems();
+
+		// shuffle items
+		this.items = this.engine.shuffle(this.items);
+	}
+
+	/**
+	 * Add the item to items collection and set it in the grid.
+	 *
+	 * @param {Item} item
+	 */
+	addItem(item) {
+		this.items.push(item);
+		this.setCellItem(item.row, item.col, item);
+	}
+
+	/**
+	 * Loads an asset and adds it to the assets collection.
+	 *
+	 * @param {String} name
+	 * @param {String} src
+	 * @returns
+	 */
+	loadAsset(name, src) {
+		return new Promise((resolve, reject) => {
+			const image = new Image();
+
+			image.onload = () => {
+				this.state.assets[name] = image;
+				resolve(image);
+			};
+
+			image.onerror = (err) => {
+				reject(err);
+			};
+
+			image.src = src;
+
+			this.state.assets[name] = image;
+		});
+	}
+
+	/**
+	 * Renders other HTML elements.
+	 */
+	renderHtml() {
+		const state = this.get("state");
+
+		// next turn text
+		const stepButton = document.getElementById("nextStep");
+		stepButton.innerText = `Turno ${state["step"]}, Siguiente`;
+	}
 }
 
 export default Game;

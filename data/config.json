@@ -1,0 +1,23 @@
+{
+  "title": "40,000 ANE",
+  "boardDimension": 800,
+  "boardCasquets": 16,
+  "assets": [
+    {
+      "name": "male-homosapiens-normal",
+      "src": "male-homosapiens-normal-48.png"
+    },
+    {
+      "name": "female-homosapiens-normal",
+      "src": "female-homosapiens-normal-48.png"
+    },
+    {
+      "name": "male-pantheraspelaea-normal",
+      "src": "male-pantheraspelaea-normal-48.png"
+    },
+    {
+      "name": "female-pantheraspelaea-normal",
+      "src": "female-pantheraspelaea-normal-48.png"
+    }
+  ]
+}
