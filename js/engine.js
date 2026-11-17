@@ -111,24 +111,21 @@ export class Engine {
 		const dimension = this.getParam("boardDimension");
 		const cells = this.getParam("boardCasquets");
 
-		// clear canvas
-		this.ctx.clearRect(0, 0, dimension, dimension);
-
-		//const grid = this.game.state.grid;
 		const cellSize = dimension / cells;
+		const ctx = this.ctx;
 
-		// define stroke color
-		this.ctx.strokeStyle = "#dddddd";
+		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-		for (let y = 0; y < cells; y++) {
-			for (let x = 0; x < cells; x++) {
-				// render every cell
-				const cellX = x * cellSize;
-				const cellY = y * cellSize;
-				this.ctx.rect(cellX, cellY, cellSize, cellSize);
-				this.ctx.stroke();
+		ctx.strokeStyle = "#dddddd";
+		ctx.beginPath();
+
+		for (let row = 0; row < cells; row++) {
+			for (let col = 0; col < cells; col++) {
+				ctx.rect(col * cellSize, row * cellSize, cellSize, cellSize);
 			}
 		}
+
+		ctx.stroke();
 	}
 
 	/**
