@@ -1,12 +1,13 @@
 import Logger from "./logger.js";
-import Game from "./game.js";
 
 export class Engine {
-	constructor(ctx) {
+	constructor(ctx, GameClass) {
 		this.ctx = ctx;
+		this.GameClass = GameClass;
 
 		this.config = {};
 		this.assets = Object.create(null);
+		this.game = null;
 	}
 
 	/**
@@ -45,7 +46,7 @@ export class Engine {
 		this.renderGrid();
 
 		// new game
-		this.game = new Game(this);
+		this.game = new this.GameClass(this);
 		await this.game.start();
 	}
 

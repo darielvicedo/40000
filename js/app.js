@@ -1,4 +1,5 @@
 import Engine from "./engine.js";
+import Game from "./game.js";
 
 /**
  * Entry Point
@@ -9,8 +10,10 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   const ctx = canvas.getContext("2d");
 
   // create engine
-  const engine = new Engine(ctx);
-  engine.ignite();
+  const engine = new Engine(ctx, Game);
+
+  // ignite
+  await engine.ignite();
 
   // html elements
   const newGameButton = document.getElementById("newGame");
